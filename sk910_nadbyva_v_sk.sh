@@ -83,7 +83,7 @@ while read line; do
       xc=$(echo $x | wc -w  | bc)
       if [[ $xc -eq 0 ]]; then
          echo "NOTE $match_id $idno not found in local catalogue. This line can be deleted: $line" | tee -a $log_file
-         echo "$line" >>$output_file
+         echo "$idno" >>$output_file
       fi
    fi
    linecurrent=$((++linecurrent))
