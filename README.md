@@ -7,6 +7,8 @@ Jazyk: Bourne Shell (BASH), jinak vyžaduje jen exporty lokální dat a ze Soubo
 License: GNU, matyas.bajger@osu.cz
 
 
+Viz též popisná prezentace https://github.com/osulib/Souborny-katalog---porovnani-ID/blob/main/%C4%8Cist%C3%ADc%C3%AD%20(a%20p%C5%99%C3%ADpravn%C3%A9)%20tipy%20k%20Souborn%C3%A9mu%20katalogu%20(Bajger%2C%20Z%C3%A1ho%C5%99%C3%ADk).pptx
+
 
 ## Vstupy
 
@@ -48,11 +50,11 @@ b) Maximalistický: pro navázání co největšího počtu záznamů. na vstupu
 
 Skript ### sk910_nadbyva_v_sk.sh
 
-Na výstupu řádkový seznam polí 910 k odstranění.
+Na výstupu seznam lokálních ID k odstranění.
 
-`000390391 910 L $$aOSD001$$x000075479`
+`000075479`
 
-`000675821 910 L $$aOSD001$$x000135487`
+`000135487`
 
 Co s tím?
 
@@ -60,7 +62,7 @@ Co s tím?
 
 2. Ověřit lokální záznamy ?
 
-3. Poslat R. Záhoříkovi výstup k odstranění ze SK (raději než $$ pODPIS Podle definice standardního (definice dat pro SK) nebo maximalistického přístupu (celá BIB báze mimo unikátní?)
+3. Poslat R. Záhoříkovi výstup k odstranění ze SK. Pro více sigel každou zvlášť nebo i se siglo. Tento postup je vhodnější než $$pODPIS Podle definice standardního (definice dat pro SK) nebo maximalistického přístupu (celá BIB báze mimo unikátní?)
 
 
 
@@ -110,11 +112,11 @@ Ostatní označí k ruční opravě.
 
 Tři výstupní soubory:
 
-1. `duplicate_sk` = jen jeden záznam v lokálním katalogu, soubor lze poslat do NK na opravu pole 910;
+1. `duplicate_sk` = jen jeden záznam v lokálním katalogu, soubor obsahuje lokální ID k odstranění ze SK. Soubor lze poslat do NK.
 
-000384865 910 L $$aOSD001$$x000116461
+000116461
 
-000385352 910 L $$aOSD001$$x000200583
+000200583
 
 2. `duplicate_sk.multi` = jednomu záznamu v SK odpovídá vice v lokálních datech --> ruční kontrola;
 
@@ -167,7 +169,7 @@ Dohledá idno/sysno v lokálních datech na základě signatury dle pole 910 neb
 Výsledek - pole 910 s doplnenym sysno vhodne pro predani NK pro upload do SK je : chybi_podpole_x
 
        Chybove a problematicke pripady k rucnimu provereni najdete: chybi_podpole_x.err
-
+Pro opravu SK lze tyto záznamz znova standardní cestou (OAI, FTP) poslat do SK. Lze též zaslat e-mailem samotný výstup skriptu - pole 910 z SK rpo import bez kontrol. Knihovna si však odpovídá za obsah těchto polí.
 
 
 
