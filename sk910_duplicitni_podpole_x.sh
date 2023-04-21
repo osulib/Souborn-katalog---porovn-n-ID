@@ -1,5 +1,5 @@
 #!/bin/bash
-#skript srovna data ze Souborneho katalgu CR - pole 910 s vlastni siglou, ktera obsahuji vice nez jedno podpole x s ID number nebo sysnem lokalniho zaznamu. Vystupni soubor TODO co obsahuj
+#skript srovna data ze Souborneho katalogu CR - pole 910 s vlastni siglou, ktera obsahuji vice nez jedno podpole x s ID number nebo sysnem lokalniho zaznamu. Vystupni soubor TODO co obsahuj
 #Skript vyzaduje export lokalnich poli ze Souborneho katalogu stazitelny na https://aleph.nkp.cz/skc/download/skc_910_{{sigla}}.tar.gz a z toho zipu nasledne ziskany soubor skc_910_{{sigla}}.dat
 #               a dale kompletni export lokalnich dat v Aleph sekvencnim formatu (ziskany pomoci print-03)
 #made by Matyas Bajger, osu.cz, 2023, license frei
@@ -29,10 +29,6 @@ if [ "$match_id" = "1" ]; then match_id='idno'
 elif [ "$match_id" = "2" ]; then match_id='sysno'
 else  echo "ERROR - unrecognised value: $match_id (should be 1 or 2)"; exit; fi
 
-#Rsigla
-sigla_def=''
-read -p "Vase sigla : " -i "$sigla_def" -e sigla
-sigla=$(echo "$sigla" | sed 's/\s//g' | tr a-z A-Z)
 
 #output file
 output_file_def='duplicate_sk'
@@ -72,10 +68,14 @@ while read line; do
    #count x field(s) occuration
    no_of_x=$(echo "$line" | grep -o '\$\$x' | wc -l | bc )
    if [[ $no_of_x -gt 1 ]]; then
-      ids='' 
+      ids_sk='' 
+      ids_local='' 
+      cp /dev/null /tmp/ids_local
+      cp /dev/null /tmp/ids_sk
       err=0
       sk_sysno=$(echo "$line" | awk '{print $1;}')
       echo "'$line'" | grep -o '\$\$x[^\$]\+' | sed 's/\$\$x//g' | sed "s/'//g" | while read idno; do
+         echo "$idno" >>/tmp/ids_sk
          if [ $match_id = 'sysno' ]; then
             x=$(grep "^$idno" /tmp/bib_seq.idns | awk '{print $1;}' | sort -u )
          else #idno
@@ -86,17 +86,23 @@ while read line; do
             echo "	ERROR - more than one records ($xc) with $idno found in aleph seq export. Process manually"
             err=$((++err))
          elif [[ $xc -eq 1 ]]; then   
-            ids="$ids $x"
+echo "DEBUG one hint adding $idno to /tmp/ids_local"
+            echo "$idno" >>/tmp/ids_local
          fi
-         echo "$ids" >/tmp/ids
       done
-      ids=$(cat /tmp/ids)
+      ids_sk=$(cat /tmp/ids_sk)
+      ids_local=$(cat /tmp/ids_local)
       if [[ $err -lt 1 ]]; then 
-         idcount=$(echo "$ids" | wc -w | bc)
-         if [ "$idcount" = 1 ]; then  #array length, great just one hint, construct the line to output file
-            ids=$(echo "$ids" | sed 's/\s//g')
-            echo "	one hint - result is: $sk_sysno 910   L "'$$a'"$sigla"'$$x'"$ids" | tee -a "$log_file"
-            echo "$sk_sysno 910   L "'$$a'"$sigla"'$$x'"$ids" >>"$output_file"
+         idcount=$(echo "$ids_local" | wc -l | bc)
+         if [ "$idcount" = 1 ]; then  #great just one hint, construct the line to output file
+            ids_local=$(echo "$ids_local" | sed 's/\s//g')
+#DEBUG TOFO
+echo cat /tmp/ids_local
+cat /tmp/ids_local
+echo cat /tmp/ids_sk
+cat /tmp/ids_sk
+            echo "	one hint - found $match_id $ids_local"". Other(s) can be deleted from SK" | tee -a "$log_file"
+            grep -v -f /tmp/ids_local /tmp/ids_sk >>"$output_file"
          elif [ "$idcount" = 0 ]; then #no hints, no idn found
             echo "	WARNING - no $match_id has been found in aleph seq data for this line ( $line ) " | tee -a "$log_file"
             echo "$line" >>"$output_file.nomatch"
@@ -109,7 +115,7 @@ while read line; do
    linecurrent=$((++linecurrent))
 done <"$sk910file"        
 
-
+rm -f /tmp/ids*
 echo END `date` >>$log_file
 echo "Log file is : $log_file"
 echo "Result files are : " | tee -a "$log_file"
