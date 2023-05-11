@@ -86,8 +86,8 @@ while read line; do
          echo "	WARNING - line $line contains NO call no. in subfield B" | tee -a "$log_file"
          echo "$line - radek neobsahuje signaturu (podpole b)" >>"$output_file".err
       elif [[ $is_call_no -gt 1 ]]; then
-         echo "	WARNING - line $line contains more then one call nos. in subfields B" | tee -a "$log_file"
-         echo "$line - radek neobsahuje vice nez jednu signaturu (podpole b)" >>"$output_file".err
+         echo "	WARNING - line $line contains more then one call nos. in subfields $call_subfield"" | tee -a "$log_file"
+         echo "$line - radek neobsahuje vice nez jednu signaturu (podpole $call_subfield")" >>"$output_file".err
       else #ok
          #get callno and look for it in local data
          call_no=$(echo "$line" | grep '\$\$'$call_subfield'[^\$]\+' -o | sed 's/\$\$'$call_subfield'//')
